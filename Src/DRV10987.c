@@ -17,8 +17,10 @@ void statusRegRead( I2C_HandleTypeDef * hi2c, uint8_t * regBuf )
 		HAL_I2C_Mem_Read(hi2c,(DRVI2Cadd<<1),(i),1,&regBuf[2 * i]/*tempBuff*/,2,1000);
 		//regBuf[2*i]=tempBuff[0];
 		//regBuf[2*i+1]=tempBuff[1];
-		HAL_Delay(5);
+		HAL_Delay(1);
 	}
+	HAL_Delay(5);
+
 }
 
 static void waitReadyState(I2C_HandleTypeDef * hi2c){

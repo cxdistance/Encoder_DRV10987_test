@@ -61,17 +61,38 @@ uint8_t confBuf[14]={0};
 //#define WORD16(v) ((v) & 0xFF), ((v) >> 8)
 #define WORD16(v) ((v) >> 8), ((v) & 0xFF)
 
-uint8_t configVals[14]={
-		WORD16(0x000A),
-		WORD16(0x0000),
-		WORD16(0x0000),
-		WORD16(0x0004),
-		WORD16(0x0000),
-		WORD16(0x0000),
-		WORD16(0x0000),//Fill these in from the Datasheet
 
-};
+//uint8_t configVals[14]={//attempt at manual setup of Bullrunning motor; abandoned because iterating was too slow.
+//		WORD16(0b0100000000000111),//Set Rm to 0.0388
+//		WORD16(0b0000101000101111),//0x052F),//set Kt value to 0x0A 9mV/Hz - 1000mv/1700rpm/V/60*7PP, 150uS advance time
+//		WORD16(0b0000100011011010),//1.6A current in open loop,0.7Vcc/s
+//		WORD16(0b0010010010011011),//6.9Hz/s2, 9.2Hz/s, 51Hz open-closed loop ,0.67s align time
+//		WORD16(0b1011111110101110),//1.6A on overtemp, all locks enabled, 2A SW limit, 2.8A HWlim
+//		WORD16(0b1110110001000000),//PWM input, 50KhZ, 3/2Kt,1/2Ktlim, induc+mechAVS en, AVS-VCC, brk on indres, closed loop, 0.37VCC/s,5% min duty,35V/us
+//		WORD16(0b0000000000100101),//Score control 0.5, Dead time 240nS Fill these in from the Datasheet
+//
+//};
 
+//Configvals from AlexPS's DRV calculator at http://f0319644.xsph.ru/
+uint8_t configVals[14]={//Bullrunning
+		WORD16(0x169A),//
+		WORD16(0x062A),//
+		WORD16(0x00D0),//
+		WORD16(0x09FB),//
+		WORD16(0xBF7F),//
+		WORD16(0xEC63),//
+		WORD16(0x016A)};
+
+//Propdrive1200
+//uint8_t configVals[14]={//Propdrive 28-26 1200Kv
+//
+//		WORD16(0x159A),//
+//		WORD16(0x092A),//
+//		WORD16(0x00D0),//
+//		WORD16(0x12FB),//
+//		WORD16(0xBC7F),//
+//		WORD16(0xAC63),//
+//		WORD16(0x016A)};
 
 uint8_t DIEid[2]={0};
 
@@ -129,7 +150,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
-__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,1000);
+__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,2000);
 
 configRegWrite(&hi2c1,configVals);
   /* USER CODE END 2 */
@@ -139,9 +160,10 @@ configRegWrite(&hi2c1,configVals);
   while (1)
   {
 	  HAL_UART_Transmit(&huart2,"Hello Wrld\r",13, 10);
-	 /* if(HAL_I2C_IsDeviceReady(&hi2c1,(dEvice_addr<<1),1,10)==HAL_OK){
+	  if(HAL_I2C_IsDeviceReady(&hi2c1,(DRVI2Cadd<<1),1,10)==HAL_OK){
 	  	  	                  HAL_UART_Transmit(&huart2,"DRV Ready\r",13, 10);
-	  	  	  }*/
+
+	  }
 
     /* USER CODE END WHILE */
 
